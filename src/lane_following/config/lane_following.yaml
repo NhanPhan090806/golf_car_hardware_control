@@ -1,0 +1,98 @@
+# lane_following Phase A (preview only). All values are provisional until
+# tuned on real camera recordings (Phase B). Geometry is in fractions of the
+# processing image; `ros2 run lane_following lane_detect_image` and the node
+# log the effective pixel values.
+lane_following_node:
+  ros__parameters:
+    input:
+      mode: synthetic        # image | video | camera | synthetic | ros
+      path: ""               # file/dir for image/video, device index for camera
+      rate_hz: 10.0          # replay rate for image/dir/synthetic sources
+      loop: true
+      topic: /camera/image_raw
+      check_stamp_age: false # also apply the age limit to ROS header stamps
+      image_reliability: best_effort  # or reliable (large frames, small socket buffers)
+    output:
+      motion_topic: /lane_following/debug/motion_cmd
+      # /vehicle/control/motion_cmd is refused unless this is true AND
+      # ROS_DOMAIN_ID is set to an isolated, non-zero domain.
+      allow_vehicle_topic: false
+    debug:
+      publish_image: true    # JPEG is only encoded while someone subscribes
+      jpeg_quality: 80
+    # Phase B, STEERING ONLY. Throttle/brake are always 0 and gear NEUTRAL.
+    # Enabled by vehicle_integration.launch.py; keep false for preview.
+    hardware:
+      enabled: false
+      controller_node: vehicle_controller
+      vehicle_state_timeout_s: 0.5  # /vehicle/state/system older than this latches a stop
+      arm_confirm_timeout_s: 0.5    # controller must report enabled within this after arming
+      steer_limit_rad: 0.5          # extra clip on the published request (controller full lock = 1.0)
+      io_output_mask: 0             # aux relays 1..5 sent while this node owns func_cmd
+      bench: false                  # true: saved image/video/synthetic may arm (raised car only)
+      bench_steer_limit_rad: 0.2    # cap used instead of steer_limit_rad when bench is true
+    # Snapshot bundles (viewer S/M keys). Nothing is written unless requested.
+    snapshot:
+      enabled: true
+      directory: ~/lane_snapshots
+      queue_capacity: 4
+      max_bundles: 200
+      max_session_mb: 500.0
+      min_free_mb: 1024.0
+      frame_cache: 8
+
+    detector:
+      processing_width: 640  # retune or rescale alpha if this changes
+      # Road polygon, [x0, y0, x1, y1, ...] as image fractions.
+      roi: [0.0, 0.98, 0.0, 0.80, 0.30, 0.58, 0.70, 0.58, 1.0, 0.80, 1.0, 0.98]
+      tophat_width_ratio: 0.06
+      min_contrast: 25
+      white_max_saturation: 60
+      white_min_value: 90
+      yellow_hue_min: 12
+      yellow_hue_max: 40
+      yellow_min_saturation: 70
+      yellow_min_value: 90
+      vertical_close_ratio: 0.0
+      min_run_width_px: 2
+      cluster_gap_factor: 2.0
+      cluster_max_gap_ratio: 0.03
+      link_row_gap: 3
+      link_tolerance_ratio: 0.012
+      min_piece_rows: 3
+      association_residual_ratio: 0.012
+      max_chain_gap_ratio: 0.25
+      fit_mode: auto         # linear | auto (quadratic fallback for curves)
+      min_support_ratio: 0.035
+      min_span_ratio: 0.12
+      max_fit_rms_ratio: 0.006
+      max_abs_slope: 4.0
+      max_bow_ratio: 0.06
+      min_inlier_fraction: 0.6
+      solid_support_fraction: 0.8
+      double_min_fraction: 0.5
+      single_max_fraction: 0.2
+      max_extrapolation_ratio: 0.04
+      max_interpolation_ratio: 0.25
+      evaluation_row_ratio: 0.75
+      min_lane_width_ratio: 0.10
+      max_lane_width_ratio: 0.90
+      check_row_offsets: [-0.08, 0.08]
+      lane_reference_x_ratio: 0.5  # column inside the lane to follow at start
+      ambiguity_margin_ratio: 0.03
+
+    steering:
+      alpha_rad_per_px: 0.002  # example value only, not a validated vehicle gain
+      alpha_reference_width: 640
+      steer_limit_rad: 1.0
+
+    tracker:
+      hold_duration_s: 0.10    # preview-only HELD boundary; 0 disables
+      track_timeout_s: 0.5
+      max_jump_ratio: 0.08
+
+    runtime:
+      publish_rate_hz: 20.0
+      max_result_age_s: 0.15
+      status_rate_hz: 2.0
+      debug_rate_hz: 5.0

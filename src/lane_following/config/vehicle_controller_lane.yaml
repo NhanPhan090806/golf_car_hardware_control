@@ -1,0 +1,30 @@
+# vehicle_controller profile for lane following (Phase B, steering only).
+# Copy of vehicle_controller/config/vehicle_controller.yaml with
+# require_function_command: true. Keep the other values in sync with that file.
+controller_manager:
+  ros__parameters:
+    update_rate: 200
+    vehicle_controller:
+      type: vehicle_controller/VehicleController
+
+vehicle_controller:
+  ros__parameters:
+    brake_joints: [RearRightDriver_Joint]
+    wheel_joints: [RearRightWheel_Joint]
+    # Axis 4 target is current feedback plus an offset in ODrive turns (max 3 turns).
+    position_max_offset_turns: 3.0
+    # Steering potentiometer calibration: left=12.5%, center=43.1%, right=73.7%
+    max_steering_angle_rad: 1.0
+    # Safety soft limit: only allow ODrive steering within 85% of potentiometer range
+    steering_pot_limit_ratio: 0.85
+    # Steering position limits: -70 to +70 turns
+    steering_max_turns: 70.0
+    steering_ramp_rate_turns_s: 35.0
+    command_timeout_ms: 250
+    # Lane following: motion stops unless func_cmd keeps arriving (250 ms timeout).
+    require_function_command: true
+    # Drive relay sequencing delays (ms): Relay 6/7 -> Relay 8 -> Throttle
+    relay_direction_delay_ms: 100
+    relay_main_delay_ms: 100
+    relay_deadtime_ms: 100
+

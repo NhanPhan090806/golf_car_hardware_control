@@ -3,6 +3,10 @@ build/
 install/
 log/
 
+# Docs
+docs/
+lane_detection_plan/ # idk whether I should comment out this line, in case of future code publish to github or sth
+
 # CMake
 CMakeFiles/
 CMakeCache.txt

@@ -4,15 +4,20 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler, TimerAction
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessStart
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     share = get_package_share_directory('vehicle_controller')
     robot_description_path = os.path.join(share, 'urdf', 'vehicle_hardware.urdf')
-    controller_config = os.path.join(share, 'config', 'vehicle_controller.yaml')
+    # Default is unchanged (bench profile). Lane following passes its own
+    # profile with require_function_command: true.
+    controller_config_arg = DeclareLaunchArgument(
+        'controller_config', default_value=os.path.join(share, 'config', 'vehicle_controller.yaml'))
+    controller_config = LaunchConfiguration('controller_config')
     with open(robot_description_path, 'r', encoding='utf-8') as urdf_file:
         robot_description = urdf_file.read()
 
@@ -59,4 +64,4 @@ def generate_launch_description():
             ],
         )
     )
-    return LaunchDescription([controller_manager, start_dependents])
+    return LaunchDescription([controller_config_arg, controller_manager, start_dependents])
