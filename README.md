@@ -1,4 +1,4 @@
-<img width="1068" height="135" alt="image" src="https://github.com/user-attachments/assets/e9d65366-629e-46fb-9fc8-bc58435565f8" /># golf_car_hardware_control
+## golf_car_hardware_control
 
 ROS 2 Humble hardware-control stack for the autonomous car (golf car) of the
 **FPT-Automation LAB, FPT University Can Tho Campus**, forked from [CQDdon/robot_hardware_control](https://github.com/CQDdon/robot_hardware_control).
