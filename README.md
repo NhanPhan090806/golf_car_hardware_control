@@ -1,7 +1,7 @@
-# golf_car_hardware_control
+<img width="1068" height="135" alt="image" src="https://github.com/user-attachments/assets/e9d65366-629e-46fb-9fc8-bc58435565f8" /># golf_car_hardware_control
 
 ROS 2 Humble hardware-control stack for the autonomous car (golf car) of the
-**AI & IoT Lab, FPT University Can Tho Campus**, forked from [CQDdon/robot_hardware_control](https://github.com/CQDdon/robot_hardware_control).
+**FPT-Automation LAB, FPT University Can Tho Campus**, forked from [CQDdon/robot_hardware_control](https://github.com/CQDdon/robot_hardware_control).
 
 This repository is the low-level control layer: it talks to the car's motor
 drivers, steering, brake, throttle, relays and sensors, decides when motion is
